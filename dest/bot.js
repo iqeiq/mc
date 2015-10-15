@@ -51,39 +51,41 @@
         };
       })(this);
       mclogfile = '/home/matcha/minecraft4/logs/latest.log';
-      require('fs').watch(mclogfile, (function(_this) {
-        return function(event) {
-          if (event === 'change') {
-            return exec("tail -n 1 " + mclogfile, function(err, stdout, stderr) {
-              var flag, line, mes, sp, t;
-              if (err || stderr) {
-                return;
-              }
-              line = stdout.toString().split(/\r*\n/);
-              if (line.length === 0) {
-                return;
-              }
-              sp = line[0].split(/]:\s*/);
-              if (sp.length < 2) {
-                return;
-              }
-              t = sp[0].split(/\s+/)[0];
-              mes = t + " " + sp[1];
-              if (_this.db.mutedCache.some(function(u) {
-                return RegExp("" + u).test(mes);
-              })) {
-                return;
-              }
-              flag = false;
-              if (/the game/.test(mes)) {
-                flag = true;
-              } else if (/earned the achievement/.test(mes)) {
-                flag = true;
-              }
-              if (flag) {
-                return _this.say(mes);
-              }
-            });
+      exec("tail -n 1 -F " + mclogfile, (function(_this) {
+        return function(err, stdout, stderr) {
+          var flag, line, mes, sp, t;
+          if (err) {
+            _this.logger.error(err);
+          }
+          if (stderr) {
+            _this.logger.trace(stderr);
+          }
+          if (err || stderr) {
+            return;
+          }
+          line = stdout.toString().split(/\r*\n/);
+          if (line.length === 0) {
+            return;
+          }
+          sp = line[0].split(/]:\s*/);
+          if (sp.length < 2) {
+            return;
+          }
+          t = sp[0].split(/\s+/)[0];
+          mes = t + " " + sp[1];
+          if (_this.db.mutedCache.some(function(u) {
+            return RegExp("" + u).test(mes);
+          })) {
+            return;
+          }
+          flag = false;
+          if (/the game/.test(mes)) {
+            flag = true;
+          } else if (/earned the achievement/.test(mes)) {
+            flag = true;
+          }
+          if (flag) {
+            return _this.say(mes);
           }
         };
       })(this));
