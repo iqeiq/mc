@@ -60,7 +60,7 @@
               _this.logger.error(err);
             }
             if (stderr) {
-              _this.logger.trace(stderr);
+              _this.logger.trace(stderr.toString());
             }
             if (err || stderr) {
               return;
@@ -214,15 +214,16 @@
     }
 
     Bot.prototype.say = function(text) {
-      var e, i, len, ref, results;
       console.log("say: " + text);
-      ref = this.emitter;
-      results = [];
-      for (i = 0, len = ref.length; i < len; i++) {
-        e = ref[i];
-        results.push(e(text));
-      }
-      return results;
+      return Promise.all(this.emitter.map((function(_this) {
+        return function(saye) {
+          return saye(text);
+        };
+      })(this)))["catch"]((function(_this) {
+        return function() {
+          return _this.logger.error(err.message);
+        };
+      })(this));
     };
 
     Bot.prototype.addEmitter = function(cb) {

@@ -53,15 +53,21 @@
     }
 
     Twitter.prototype.tweet = function(text) {
-      var data;
-      data = {
-        status: text
-      };
-      return this.client.post('statuses/update', data, function(err) {
-        if (err) {
-          throw err;
-        }
-      });
+      return new Promise((function(_this) {
+        return function(resolve, reject) {
+          var data;
+          data = {
+            status: text
+          };
+          return _this.client.post('statuses/update', data, function(err) {
+            if (err) {
+              return reject(err);
+            } else {
+              return resolve();
+            }
+          });
+        };
+      })(this));
     };
 
     Twitter.prototype.descape = function(text) {

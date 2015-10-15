@@ -36,7 +36,7 @@ module.exports = class Bot extends EventEmitter
     watcher.on 'change', =>
       exec "tail -n 1 #{mclogfile}", (err, stdout, stderr)=>
         @logger.error err if err
-        @logger.trace stderr if stderr
+        @logger.trace stderr.toString() if stderr
         return if err or stderr
         line = stdout.toString().split /\r*\n/
         return if line.length is 0
@@ -145,8 +145,9 @@ module.exports = class Bot extends EventEmitter
 
   say: (text)->
     console.log "say: " + text
-    for e in @emitter
-      e text
+    Promise.all @emitter.map((saye)=> saye text)
+      .catch =>
+        @logger.error err.message
 
   addEmitter: (cb)->
     @emitter.push cb

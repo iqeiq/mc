@@ -34,10 +34,11 @@ module.exports = class Twitter
         .then cb
       
   tweet: (text)->
-    data =
-      status: text
-    @client.post 'statuses/update', data, (err)->
-      throw err if err
+    new Promise (resolve, reject)=>
+      data =
+        status: text
+      @client.post 'statuses/update', data, (err)->
+        if err then reject(err) else resolve()
 
   descape: (text)->
     text = text.replace /&amp;/g, "&"
