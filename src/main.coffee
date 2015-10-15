@@ -36,7 +36,7 @@ fs.watch mclogfile, (event)->
       logger.error err.message if err
       logger.trace stderr.toString() if stderr
       return if err or stderr
-      line = stdout.toString()
+      line = stdout.toString().split /\r*\n/
       return if line.length is 0
       sp = line[0].split /]:\s*/
       return if sp.length < 2

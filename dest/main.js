@@ -54,7 +54,7 @@
         if (err || stderr) {
           return;
         }
-        line = stdout.toString();
+        line = stdout.toString().split(/\r*\n/);
         if (line.length === 0) {
           return;
         }
