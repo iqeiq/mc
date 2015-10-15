@@ -50,39 +50,6 @@
           return _this.emitter(screen_name, command).then(cb);
         };
       })(this));
-      exec('tail -n 1 -f ~/minecraft4/logs/latest.log', (function(_this) {
-        return function(err, stdout, stderr) {
-          var line, mes, sp;
-          if (err) {
-            _this.logger.error(err.message);
-          }
-          if (stderr) {
-            _this.logger.trace(stderr.toString());
-          }
-          if (err || stderr) {
-            return;
-          }
-          line = stdout.toString();
-          sp = line[0].split(']: ');
-          if (sp.length < 2) {
-            return;
-          }
-          mes = sp[1];
-          if (/joined the game/.test(mes)) {
-            return _this.tweet(mes);
-          } else if (/earned the achievement/.test(mes)) {
-            return _this.tweet(mes);
-          } else if (/connection/.test(mes)) {
-
-          } else if (/UUID/.test(mes)) {
-
-          } else if (/logged/.test(mes)) {
-
-          } else {
-            return _this.tweet(mes);
-          }
-        };
-      })(this));
     }
 
     Twitter.prototype.tweet = function(text) {

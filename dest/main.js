@@ -1,5 +1,5 @@
 (function() {
-  var Bot, Repl, Twitter, bot, emitter, inspect, log4js, logger, repl, setting, tracer, twi;
+  var Bot, Repl, Twitter, bot, emitter, exec, inspect, log4js, logger, repl, setting, tracer, twi;
 
   setting = require('../setting');
 
@@ -10,6 +10,8 @@
   Repl = require('./repl');
 
   inspect = require('util').inspect;
+
+  exec = require('child_process').exec;
 
   log4js = require('log4js');
 
@@ -34,6 +36,40 @@
   repl = new Repl(logger, emitter);
 
   twi = new Twitter(logger, emitter);
+
+  exec('tail -n 1 -f ~/minecraft4/logs/latest.log', function(err, stdout, stderr) {
+    var line, mes, sp;
+    if (err) {
+      logger.error(err.message);
+    }
+    if (stderr) {
+      logger.trace(stderr.toString());
+    }
+    if (err || stderr) {
+      return;
+    }
+    line = stdout.toString();
+    console.log(line);
+    sp = line[0].split(']: ');
+    if (sp.length < 2) {
+      return;
+    }
+    mes = sp[1];
+    if (/joined the game/.test(mes)) {
+      twi.tweet(mes);
+    } else if (/earned the achievement/.test(mes)) {
+      twi.tweet(mes);
+    } else if (/connection/.test(mes)) {
+      return;
+    } else if (/UUID/.test(mes)) {
+      return;
+    } else if (/logged/.test(mes)) {
+      return;
+    } else if (/<[^>]+> [^#]/.test(mes)) {
+      return;
+    }
+    return twi.tweet(mes);
+  });
 
   process.on('uncaughtException', function(err) {
     tracer.trace(err.stack);
