@@ -1,5 +1,5 @@
 (function() {
-  var Bot, Repl, Twitter, bot, emitter, exec, inspect, log4js, logger, repl, setting, tracer, twi;
+  var Bot, Repl, Twitter, bot, child, emitter, exec, inspect, log4js, logger, ref, repl, setting, spawn, tracer, twi;
 
   setting = require('../setting');
 
@@ -11,7 +11,7 @@
 
   inspect = require('util').inspect;
 
-  exec = require('child_process').exec;
+  ref = require('child_process'), exec = ref.exec, spawn = ref.spawn;
 
   log4js = require('log4js');
 
@@ -37,15 +37,10 @@
 
   twi = new Twitter(logger, emitter);
 
-  exec('tail -n 1 -f ~/minecraft4/logs/latest.log', function(err, stdout, stderr) {
+  child = spawn('tail', ['-n', '1', '-f', '~/minecraft4/logs/latest.log']);
+
+  child.stdout.on('data', function(stdout) {
     var line, mes, sp;
-    if (err) {
-      logger.error(err.message);
-    }
-    if (stderr) {
-      logger.trace(stderr.toString());
-    }
-    console.log("po");
     line = stdout.toString();
     console.log(line);
     sp = line[0].split(']: ');
@@ -53,6 +48,12 @@
       return;
     }
     mes = sp[1];
+    console.log(mes);
+    if (this.db.mutedCache.some(function(u) {
+      return RegExp("" + u).test(mes);
+    })) {
+      return;
+    }
     if (/joined the game/.test(mes)) {
       twi.tweet(mes);
     } else if (/earned the achievement/.test(mes)) {
