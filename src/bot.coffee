@@ -43,6 +43,7 @@ module.exports = class Bot extends EventEmitter
         sp = line[0].split /]:\s*/
         return if sp.length < 2
         t = sp[0].split(/\s+/)[0]
+        return if sp[1].length > 0
         mes = "#{t} #{sp[1]}"
         return if @db.mutedCache.some((u)-> ///#{u}///.test mes)
         
