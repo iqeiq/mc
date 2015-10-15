@@ -21,7 +21,7 @@
     extend(Bot, superClass);
 
     function Bot(logger) {
-      var app, server;
+      var app, mclogfile, server;
       this.logger = logger;
       app = express();
       app.get('/', function(req, res) {
@@ -33,6 +33,7 @@
         };
       })(this));
       this.db = new DB;
+      this.emitter = [];
       this.pexec = (function(_this) {
         return function(cmd) {
           return new Promise(function(resolve, reject) {
@@ -49,6 +50,49 @@
           });
         };
       })(this);
+      mclogfile = '/home/matcha/minecraft4/logs/latest.log';
+      require('fs').watch(mclogfile, (function(_this) {
+        return function(event) {
+          if (event === 'change') {
+            return exec("tail -n 1 " + mclogfile, function(err, stdout, stderr) {
+              var flag, line, mes, sp;
+              if (err) {
+                _this.logger.error(err);
+              }
+              if (stderr) {
+                _this.logger.trace(stderr);
+              }
+              if (err || stderr) {
+                return;
+              }
+              line = stdout.toString().split(/\r*\n/);
+              if (line.length === 0) {
+                return;
+              }
+              sp = line[0].split(/]:\s*/);
+              if (sp.length < 2) {
+                return;
+              }
+              mes = sp[1];
+              console.log(mes);
+              if (_this.db.mutedCache.some(function(u) {
+                return RegExp("" + u).test(mes);
+              })) {
+                return;
+              }
+              flag = false;
+              if (/the game/.test(mes)) {
+                flag = true;
+              } else if (/earned the achievement/.test(mes)) {
+                flag = true;
+              }
+              if (flag) {
+                return _this.say(mes);
+              }
+            });
+          }
+        };
+      })(this));
       this.on('command', (function(_this) {
         return function(user, cmd, respond) {
           var args, command, list, num, report;
@@ -169,6 +213,21 @@
         };
       })(this));
     }
+
+    Bot.prototype.say = function(text) {
+      var e, i, len, ref, results;
+      ref = this.emitter;
+      results = [];
+      for (i = 0, len = ref.length; i < len; i++) {
+        e = ref[i];
+        results.push(e(text));
+      }
+      return results;
+    };
+
+    Bot.prototype.addEmitter = function(cb) {
+      return this.emitter.push(cb);
+    };
 
     return Bot;
 

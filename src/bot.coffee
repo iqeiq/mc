@@ -19,6 +19,8 @@ module.exports = class Bot extends EventEmitter
     # DB
     @db = new DB
 
+    @emitter = []
+
     @pexec = (cmd)=>
       new Promise (resolve, reject)=>
         exec cmd, (err, stdout, stderr)=>
@@ -27,6 +29,29 @@ module.exports = class Bot extends EventEmitter
             resolve stdout.toString()
           else
             reject err
+
+    mclogfile = '/home/matcha/minecraft4/logs/latest.log'
+
+    require('fs').watch mclogfile, (event)=>
+      if event is 'change'
+        exec "tail -n 1 #{mclogfile}", (err, stdout, stderr)=>
+          @logger.error err if err
+          @logger.trace stderr if stderr
+          return if err or stderr
+          line = stdout.toString().split /\r*\n/
+          return if line.length is 0
+          sp = line[0].split /]:\s*/
+          return if sp.length < 2
+          mes = sp[1]
+          console.log mes
+          return if @db.mutedCache.some((u)-> ///#{u}///.test mes)
+          
+          flag = false
+          if /the game/.test mes
+            flag = true
+          else if /earned the achievement/.test mes
+            flag = true
+          @say mes if flag
 
     @on 'command', (user, cmd, respond)=>
       args = cmd.split /[\s　]+/
@@ -117,3 +142,10 @@ module.exports = class Bot extends EventEmitter
               respond "error."
         else
           respond "unknown command: #{command}"
+
+  say: (text)->
+    for e in @emitter
+      e text
+
+  addEmitter: (cb)->
+    @emitter.push cb
