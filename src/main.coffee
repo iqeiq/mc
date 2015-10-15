@@ -30,7 +30,7 @@ twi = new Twitter logger, emitter
 exec 'tail -n 1 -f ~/minecraft4/logs/latest.log', (err, stdout, stderr)->
   logger.error err.message if err
   logger.trace stderr.toString() if stderr
-  return if err or stderr
+  #return if err or stderr
   line = stdout.toString()
   console.log line
   sp = line[0].split ']: '

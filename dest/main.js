@@ -45,9 +45,6 @@
     if (stderr) {
       logger.trace(stderr.toString());
     }
-    if (err || stderr) {
-      return;
-    }
     line = stdout.toString();
     console.log(line);
     sp = line[0].split(']: ');
