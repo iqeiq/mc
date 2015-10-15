@@ -51,7 +51,7 @@
         };
       })(this);
       mclogfile = '/home/matcha/minecraft4/logs/latest.log';
-      exec("tail -n 1 -F " + mclogfile, (function(_this) {
+      exec("tail -n 1 -f " + mclogfile, (function(_this) {
         return function(err, stdout, stderr) {
           var flag, line, mes, sp, t;
           if (err) {

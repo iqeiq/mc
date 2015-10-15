@@ -34,7 +34,7 @@ module.exports = class Bot extends EventEmitter
 
     #require('fs').watch mclogfile, (event)=>
     #  if event is 'change'
-    exec "tail -n 1 -F #{mclogfile}", (err, stdout, stderr)=>
+    exec "tail -n 1 -f #{mclogfile}", (err, stdout, stderr)=>
       @logger.error err if err
       @logger.trace stderr if stderr
       return if err or stderr
