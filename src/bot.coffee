@@ -64,7 +64,7 @@ module.exports = class Bot extends EventEmitter
                     @db.mutedCache.every (u)-> u isnt p
                   num = players.length
               message = "There are #{num} players!"
-              message += " (#{players.join ', '})"
+              message += " (#{players.join ', '})" if num isnt 0
               respond message 
             .catch (err)=>
               @logger.error err.message

@@ -39,7 +39,7 @@
 
   mclogfile = '/home/matcha/minecraft4/logs/latest.log';
 
-  exec("tail -n 1 " + mclogfile, function(err, stdout, stderr) {
+  exec("tail -n 1 -f " + mclogfile, function(err, stdout, stderr) {
     var line, mes, sp;
     if (err) {
       logger.error(err.message);

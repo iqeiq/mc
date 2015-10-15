@@ -93,7 +93,9 @@
                   }
                 }
                 message = "There are " + num + " players!";
-                message += " (" + (players.join(', ')) + ")";
+                if (num !== 0) {
+                  message += " (" + (players.join(', ')) + ")";
+                }
                 return respond(message);
               })["catch"](function(err) {
                 _this.logger.error(err.message);

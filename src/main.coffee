@@ -32,7 +32,7 @@ mclogfile = '/home/matcha/minecraft4/logs/latest.log'
 
 #fs.watch mclogfile, (event)->
 #  if event is 'change'
-exec "tail -n 1 #{mclogfile}", (err, stdout, stderr)->
+exec "tail -n 1 -f #{mclogfile}", (err, stdout, stderr)->
   logger.error err.message if err
   logger.trace stderr.toString() if stderr
   return if err or stderr
