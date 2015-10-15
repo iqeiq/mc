@@ -55,13 +55,7 @@
         return function(event) {
           if (event === 'change') {
             return exec("tail -n 1 " + mclogfile, function(err, stdout, stderr) {
-              var flag, line, mes, sp;
-              if (err) {
-                _this.logger.error(err);
-              }
-              if (stderr) {
-                _this.logger.trace(stderr);
-              }
+              var flag, line, mes, sp, t;
               if (err || stderr) {
                 return;
               }
@@ -73,8 +67,8 @@
               if (sp.length < 2) {
                 return;
               }
-              mes = sp[1];
-              console.log(mes);
+              t = sp[0].split(/\s+/)[0];
+              mes = t + " " + sp[1];
               if (_this.db.mutedCache.some(function(u) {
                 return RegExp("" + u).test(mes);
               })) {
