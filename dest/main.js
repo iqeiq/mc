@@ -39,7 +39,7 @@
 
   twi = new Twitter(logger, emitter);
 
-  mclogfile = '~/minecraft4/logs/latest.log';
+  mclogfile = '/home/matcha/minecraft4/logs/latest.log';
 
   fs.watch(mclogfile, function(event) {
     console.log(event);
