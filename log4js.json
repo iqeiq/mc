@@ -1,0 +1,21 @@
+{
+  "appenders": [
+    {"type": "console"},
+    {
+      "type": "file",
+      "category": "system",
+      "maxLogSize": 20480,
+      "filename": "log/system.log"
+    },
+    {
+      "type": "file",
+      "category": "trace",
+      "maxLogSize": 20480,
+      "filename": "log/trace.log"
+    }
+  ],
+  "levels": {
+    "system": "INFO",
+    "trace": "TRACE"
+  }
+}
