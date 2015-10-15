@@ -82,12 +82,13 @@ module.exports = class Bot extends EventEmitter
               line.splice 0, 2
               num = 0
               if line.length > 0
-                sp = line[0].split ']: '
+                sp = line[0].split /]:\s*/
                 if sp.length is 2
-                  players = sp[1].split ', '
-                  players = players.filter (p)=> 
-                    @db.mutedCache.every (u)-> u isnt p
-                  num = players.length
+                  if sp[1].length > 0
+                    players = sp[1].split ', '
+                    players = players.filter (p)=> 
+                      @db.mutedCache.every (u)-> u isnt p
+                    num = players.length
               message = "There are #{num} players!"
               message += " (#{players.join ', '})" if num isnt 0
               respond message 

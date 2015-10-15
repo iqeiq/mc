@@ -124,15 +124,17 @@
                 line.splice(0, 2);
                 num = 0;
                 if (line.length > 0) {
-                  sp = line[0].split(']: ');
+                  sp = line[0].split(/]:\s*/);
                   if (sp.length === 2) {
-                    players = sp[1].split(', ');
-                    players = players.filter(function(p) {
-                      return _this.db.mutedCache.every(function(u) {
-                        return u !== p;
+                    if (sp[1].length > 0) {
+                      players = sp[1].split(', ');
+                      players = players.filter(function(p) {
+                        return _this.db.mutedCache.every(function(u) {
+                          return u !== p;
+                        });
                       });
-                    });
-                    num = players.length;
+                      num = players.length;
+                    }
                   }
                 }
                 message = "There are " + num + " players!";
