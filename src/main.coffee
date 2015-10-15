@@ -4,6 +4,7 @@ Twitter = require './twitter'
 Repl = require './repl'
 
 {inspect} = require 'util'
+{exec} = require 'child_process'
 log4js = require 'log4js'
 
 #log
@@ -26,6 +27,28 @@ repl = new Repl logger, emitter
 # twitter
 twi = new Twitter logger, emitter
 
+exec 'tail -n 1 -f ~/minecraft4/logs/latest.log', (err, stdout, stderr)->
+  logger.error err.message if err
+  logger.trace stderr.toString() if stderr
+  return if err or stderr
+  line = stdout.toString()
+  console.log line
+  sp = line[0].split ']: '
+  return if sp.length < 2
+  mes = sp[1]
+  if /joined the game/.test mes
+    twi.tweet mes
+  else if /earned the achievement/.test mes
+    twi.tweet mes
+  else if /connection/.test mes
+    return
+  else if /UUID/.test mes
+    return
+  else if /logged/.test mes
+    return
+  else  if /<[^>]+> [^#]/.test mes
+    return
+  twi.tweet mes
 
 # uncaughtException
 process.on 'uncaughtException', (err)->
