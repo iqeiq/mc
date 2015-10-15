@@ -1,5 +1,5 @@
 (function() {
-  var Bot, Repl, Twitter, bot, emitter, exec, fs, inspect, log4js, logger, mclogfile, repl, setting, tracer, twi;
+  var Bot, Repl, Twitter, bot, emitter, exec, inspect, log4js, logger, mclogfile, repl, setting, tracer, twi;
 
   setting = require('../setting');
 
@@ -12,8 +12,6 @@
   inspect = require('util').inspect;
 
   exec = require('child_process').exec;
-
-  fs = require('fs');
 
   log4js = require('log4js');
 
@@ -41,49 +39,46 @@
 
   mclogfile = '/home/matcha/minecraft4/logs/latest.log';
 
-  fs.watch(mclogfile, function(event) {
-    console.log(event);
-    if (event === 'change') {
-      return exec("tail -n 1 " + mclogfile, function(err, stdout, stderr) {
-        var line, mes, sp;
-        if (err) {
-          logger.error(err.message);
-        }
-        if (stderr) {
-          logger.trace(stderr.toString());
-        }
-        if (err || stderr) {
-          return;
-        }
-        line = stdout.toString();
-        console.log(line);
-        sp = line[0].split(']: ');
-        if (sp.length < 2) {
-          return;
-        }
-        mes = sp[1];
-        console.log(mes);
-        if (this.db.mutedCache.some(function(u) {
-          return RegExp("" + u).test(mes);
-        })) {
-          return;
-        }
-        if (/joined the game/.test(mes)) {
-          twi.tweet(mes);
-        } else if (/earned the achievement/.test(mes)) {
-          twi.tweet(mes);
-        } else if (/connection/.test(mes)) {
-          return;
-        } else if (/UUID/.test(mes)) {
-          return;
-        } else if (/logged/.test(mes)) {
-          return;
-        } else if (/<[^>]+> [^#]/.test(mes)) {
-          return;
-        }
-        return twi.tweet(mes);
-      });
+  exec("tail -n 1 -f " + mclogfile, function(err, stdout, stderr) {
+    var line, mes, sp;
+    if (err) {
+      logger.error(err.message);
     }
+    if (stderr) {
+      logger.trace(stderr.toString());
+    }
+    if (err || stderr) {
+      return;
+    }
+    line = stdout.toString();
+    if (line.length === 0) {
+      return;
+    }
+    sp = line[0].split(/]:\s*/);
+    if (sp.length < 2) {
+      return;
+    }
+    mes = sp[1];
+    console.log(mes);
+    if (this.db.mutedCache.some(function(u) {
+      return RegExp("" + u).test(mes);
+    })) {
+      return;
+    }
+    if (/joined the game/.test(mes)) {
+      twi.tweet(mes);
+    } else if (/earned the achievement/.test(mes)) {
+      twi.tweet(mes);
+    } else if (/connection/.test(mes)) {
+      return;
+    } else if (/UUID/.test(mes)) {
+      return;
+    } else if (/logged/.test(mes)) {
+      return;
+    } else if (/<[^>]+> [^#]/.test(mes)) {
+      return;
+    }
+    return twi.tweet(mes);
   });
 
   process.on('uncaughtException', function(err) {

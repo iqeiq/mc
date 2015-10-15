@@ -55,7 +55,7 @@
     Twitter.prototype.tweet = function(text) {
       var data;
       data = {
-        status: "text"
+        status: text
       };
       return this.client.post('statuses/update', data, function(err) {
         if (err) {

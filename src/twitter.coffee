@@ -35,7 +35,7 @@ module.exports = class Twitter
       
   tweet: (text)->
     data =
-      status: "text"
+      status: text
     @client.post 'statuses/update', data, (err)->
       throw err if err
 
