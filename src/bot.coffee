@@ -32,26 +32,26 @@ module.exports = class Bot extends EventEmitter
 
     mclogfile = '/home/matcha/minecraft4/logs/latest.log'
 
-    #require('fs').watch mclogfile, (event)=>
-    #  if event is 'change'
-    exec "tail -n 1 -f #{mclogfile}", (err, stdout, stderr)=>
-      @logger.error err if err
-      @logger.trace stderr if stderr
-      return if err or stderr
-      line = stdout.toString().split /\r*\n/
-      return if line.length is 0
-      sp = line[0].split /]:\s*/
-      return if sp.length < 2
-      t = sp[0].split(/\s+/)[0]
-      mes = "#{t} #{sp[1]}"
-      return if @db.mutedCache.some((u)-> ///#{u}///.test mes)
-      
-      flag = false
-      if /the game/.test mes
-        flag = true
-      else if /earned the achievement/.test mes
-        flag = true
-      @say mes if flag
+    watcher = require('fs').watch mclogfile
+    watcher.on 'change', =>
+      exec "tail -n 1 #{mclogfile}", (err, stdout, stderr)=>
+        @logger.error err if err
+        @logger.trace stderr if stderr
+        return if err or stderr
+        line = stdout.toString().split /\r*\n/
+        return if line.length is 0
+        sp = line[0].split /]:\s*/
+        return if sp.length < 2
+        t = sp[0].split(/\s+/)[0]
+        mes = "#{t} #{sp[1]}"
+        return if @db.mutedCache.some((u)-> ///#{u}///.test mes)
+        
+        flag = false
+        if /the game/.test mes
+          flag = true
+        else if /earned the achievement/.test mes
+          flag = true
+        @say mes if flag
 
     @on 'command', (user, cmd, respond)=>
       args = cmd.split /[\s　]+/
