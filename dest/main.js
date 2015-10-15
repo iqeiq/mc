@@ -45,6 +45,7 @@
     if (stderr) {
       logger.trace(stderr.toString());
     }
+    console.log("po");
     line = stdout.toString();
     console.log(line);
     sp = line[0].split(']: ');

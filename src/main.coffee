@@ -31,6 +31,7 @@ exec 'tail -n 1 -f ~/minecraft4/logs/latest.log', (err, stdout, stderr)->
   logger.error err.message if err
   logger.trace stderr.toString() if stderr
   #return if err or stderr
+  console.log "po"
   line = stdout.toString()
   console.log line
   sp = line[0].split ']: '
