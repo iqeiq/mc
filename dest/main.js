@@ -60,7 +60,7 @@
     }
     mes = sp[1];
     console.log(mes);
-    if (db.mutedCache.some(function(u) {
+    if (bot.db.mutedCache.some(function(u) {
       return RegExp("" + u).test(mes);
     })) {
       return;

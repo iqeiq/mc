@@ -42,7 +42,7 @@ exec "tail -n 1 #{mclogfile}", (err, stdout, stderr)->
   return if sp.length < 2
   mes = sp[1]
   console.log mes
-  return if db.mutedCache.some((u)-> ///#{u}///.test mes)
+  return if bot.db.mutedCache.some((u)-> ///#{u}///.test mes)
   if /joined the game/.test mes
     twi.tweet mes
   else if /earned the achievement/.test mes
