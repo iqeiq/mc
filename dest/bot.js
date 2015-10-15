@@ -216,6 +216,7 @@
 
     Bot.prototype.say = function(text) {
       var e, i, len, ref, results;
+      console.log("say: " + text);
       ref = this.emitter;
       results = [];
       for (i = 0, len = ref.length; i < len; i++) {

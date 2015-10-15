@@ -144,6 +144,7 @@ module.exports = class Bot extends EventEmitter
           respond "unknown command: #{command}"
 
   say: (text)->
+    console.log "say: " + text
     for e in @emitter
       e text
 
