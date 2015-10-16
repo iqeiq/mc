@@ -19,20 +19,29 @@
         access_token_key: setting.TWITTER.ACCESS_TOKEN,
         access_token_secret: setting.TWITTER.ACCESS_SECRET
       });
-      this.client.stream('user', {}, (function(_this) {
-        return function(stream) {
-          stream.on('data', function(tweet) {
-            if (tweet.text != null) {
-              return _this.procTweet(tweet);
-            }
-          });
-          return stream.on('error', function(err) {
-            if (err) {
-              throw err;
-            }
+      this.connect = (function(_this) {
+        return function() {
+          return _this.client.stream('user', {}, function(stream) {
+            stream.on('data', function(tweet) {
+              if (tweet.text != null) {
+                return _this.procTweet(tweet);
+              }
+            });
+            stream.on('error', function(err) {
+              if (err) {
+                throw err;
+              }
+            });
+            return stream.on('end', function() {
+              _this.logger.info("stream disconnected. try reconnect.");
+              return setTimeout(function() {
+                return _this.reconnect();
+              }, 3000);
+            });
           });
         };
-      })(this));
+      })(this);
+      this.connect();
       this.commands = [];
       this.addCommand(/stop/i, function(screen_name, text, cb) {
         setTimeout((function() {
@@ -53,6 +62,10 @@
         };
       })(this));
     }
+
+    Twitter.prototype.reconnect = function() {
+      return this.connect();
+    };
 
     Twitter.prototype.tweet = function(text) {
       return new Promise((function(_this) {

@@ -1,9 +1,6 @@
 ###
 TODO:
   report 140文字制限
-  delete bugfix確認
-  death messages判定
-  server command実装
 ###
 
 

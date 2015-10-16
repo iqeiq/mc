@@ -5,18 +5,28 @@ twitter = require 'twitter'
 
 module.exports = class Twitter
   constructor: (@logger, @emitter)->
+    
     @client = new twitter
       consumer_key: setting.TWITTER.CONSUMER_KEY
       consumer_secret: setting.TWITTER.CONSUMER_SECRET
       access_token_key: setting.TWITTER.ACCESS_TOKEN
       access_token_secret: setting.TWITTER.ACCESS_SECRET
 
-    @client.stream 'user', {}, (stream)=>
-      stream.on 'data', (tweet)=>
-        @procTweet tweet if tweet.text?
+    @connect = =>
+      @client.stream 'user', {}, (stream)=>
+        stream.on 'data', (tweet)=>
+          @procTweet tweet if tweet.text?
 
-      stream.on 'error', (err)->
-        throw err if err
+        stream.on 'error', (err)->
+          throw err if err
+
+        stream.on 'end', =>
+          @logger.info "stream disconnected. try reconnect."
+          setTimeout =>
+            @reconnect()
+          , 3000
+
+    @connect()
 
     @commands = []
 
@@ -32,6 +42,9 @@ module.exports = class Twitter
       command = text.replace /^cmd:[\s　]*/i, ''
       @emitter screen_name, command
         .then cb
+
+  reconnect: ->
+    @connect()
       
   tweet: (text)->
     new Promise (resolve, reject)=>
