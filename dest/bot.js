@@ -53,9 +53,15 @@
         };
       })(this);
       mclogfile = '/home/matcha/minecraft4/logs/latest.log';
-      watcher = require('fs').watch(mclogfile);
-      watcher.on('change', (function(_this) {
-        return function() {
+      watcher = require('fs').watch(mclogfile, (function(_this) {
+        return function(event) {
+          if (event === 'rename') {
+            _this.logger.info("logfile rotated. try restart.");
+            return process.exit(1);
+          }
+          if (event !== 'change') {
+            return;
+          }
           return exec("tail -n 1 " + mclogfile, function(err, stdout, stderr) {
             var flag, line, mes, res, sp, t;
             if (err) {

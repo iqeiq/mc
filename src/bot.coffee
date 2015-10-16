@@ -34,8 +34,11 @@ module.exports = class Bot extends EventEmitter
 
     mclogfile = '/home/matcha/minecraft4/logs/latest.log'
 
-    watcher = require('fs').watch mclogfile
-    watcher.on 'change', =>
+    watcher = require('fs').watch mclogfile, (event)=>
+      if event is 'rename'
+        @logger.info "logfile rotated. try restart."
+        return process.exit 1
+      return unless event is 'change'
       exec "tail -n 1 #{mclogfile}", (err, stdout, stderr)=>
         @logger.error err if err
         @logger.trace stderr.toString() if stderr
