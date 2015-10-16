@@ -16,7 +16,7 @@ module.exports = class Twitter
         @procTweet tweet if tweet.text?
 
       stream.on 'error', (err)->
-        throw err
+        throw err if err
 
     @commands = []
 
@@ -93,7 +93,8 @@ module.exports = class Twitter
             data =
               status: "@#{screen_name} #{res}"
               in_reply_to_status_id: reply_status_id
-            @client.post 'statuses/update', data, (err)-> throw error if err
+            @client.post 'statuses/update', data, (err)->
+              throw error if err
           return
 
       @emitter screen_name, "list"

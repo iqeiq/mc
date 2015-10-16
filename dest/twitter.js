@@ -27,7 +27,9 @@
             }
           });
           return stream.on('error', function(err) {
-            throw err;
+            if (err) {
+              throw err;
+            }
           });
         };
       })(this));

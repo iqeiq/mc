@@ -1,5 +1,5 @@
 (function() {
-  var Bot, DB, EventEmitter, exec, express, inspect, setting, util,
+  var Bot, DB, EventEmitter, dm, exec, express, inspect, setting, util,
     extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
     hasProp = {}.hasOwnProperty;
 
@@ -8,6 +8,8 @@
   util = require('./util');
 
   DB = require('./db');
+
+  dm = require('./deathmessages');
 
   EventEmitter = require('events').EventEmitter;
 
@@ -55,7 +57,7 @@
       watcher.on('change', (function(_this) {
         return function() {
           return exec("tail -n 1 " + mclogfile, function(err, stdout, stderr) {
-            var flag, line, mes, sp, t;
+            var dmr, flag, i, len, line, mes, res, sp, t;
             if (err) {
               _this.logger.error(err);
             }
@@ -88,6 +90,16 @@
               flag = true;
             } else if (/earned the achievement/.test(mes)) {
               flag = true;
+            } else if (/<[^>]+>\s*#/.test(mes)) {
+              res = /<([^>]+)>\s*#\s*(.+)/.test(mes);
+              _this.emit('command', res[1], res[2], function(res) {});
+            }
+            for (i = 0, len = dm.length; i < len; i++) {
+              dmr = dm[i];
+              if (dmr.test(mes)) {
+                flag = true;
+                break;
+              }
             }
             if (flag) {
               return _this.say(mes);
@@ -204,7 +216,7 @@
               if (args.length !== 1) {
                 return respond("usage: delete (report number)");
               }
-              num = parseInt(arg[0]);
+              num = parseInt(args[0]);
               return _this.db.remove(num).then(function(res) {
                 return respond("ok.");
               })["catch"](function(err) {

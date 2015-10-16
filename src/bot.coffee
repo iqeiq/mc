@@ -1,10 +1,12 @@
 setting = require '../setting'
 util = require './util'
 DB = require './db'
+dm = require './deathmessages'
 
 {EventEmitter} = require 'events'
 {exec} = require 'child_process'
 {inspect} = require 'util'
+
 
 express = require 'express'
 
@@ -52,6 +54,13 @@ module.exports = class Bot extends EventEmitter
           flag = true
         else if /earned the achievement/.test mes
           flag = true
+        else if /<[^>]+>\s*#/.test mes
+          res = /<([^>]+)>\s*#\s*(.+)/.test mes
+          @emit 'command', res[1], res[2], (res)->
+        for dmr in dm
+          if dmr.test mes
+            flag = true
+            break
         @say mes if flag
 
     @on 'command', (user, cmd, respond)=>
@@ -136,7 +145,7 @@ module.exports = class Bot extends EventEmitter
         when 'delete'
           unless args.length is 1
             return respond "usage: delete (report number)"
-          num = parseInt arg[0]
+          num = parseInt args[0]
           @db.remove num
             .then (res)-> respond "ok."
             .catch (err)=>
