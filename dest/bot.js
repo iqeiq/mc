@@ -99,7 +99,7 @@
                 results = [];
                 for (i = 0, len = ref.length; i < len; i++) {
                   line = ref[i];
-                  results.push(_this.pexec("/etc/init.d/minecraft command say " + line)["catch"](function(err) {
+                  results.push(_this.pexec("/etc/init.d/minecraft command tell " + res[1] + " " + line)["catch"](function(err) {
                     if (err) {
                       return logger.error(err);
                     }
