@@ -55,14 +55,16 @@ module.exports = class Bot extends EventEmitter
         else if /earned the achievement/.test mes
           flag = true
         else if /<[^>]+>\s*#/.test mes
-          res = /<([^>]+)>\s*#\s*(.+)/.test mes
+          res = /<([^>]+)>\s*#\s*(.+)/.exec mes
+          console.log "#{res[1]} #{res[2]}"
           @emit 'command', res[1], res[2], (res)=>
             for line in res.split /\r*\n/
               @pexec "/etc/init.d/minecraft command say #{line}"
                 .catch (err)=>
                   logger.error err if err
-        if dm.some((v)-> v.test mes)
-          flag = true
+        unless /<[^>]+>/.test mes
+          if dm.some((v)-> v.test mes)
+            flag = true
         @say mes if flag
 
     @on 'command', (user, cmd, respond)=>

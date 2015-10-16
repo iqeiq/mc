@@ -91,7 +91,8 @@
             } else if (/earned the achievement/.test(mes)) {
               flag = true;
             } else if (/<[^>]+>\s*#/.test(mes)) {
-              res = /<([^>]+)>\s*#\s*(.+)/.test(mes);
+              res = /<([^>]+)>\s*#\s*(.+)/.exec(mes);
+              console.log(res[1] + " " + res[2]);
               _this.emit('command', res[1], res[2], function(res) {
                 var i, len, ref, results;
                 ref = res.split(/\r*\n/);
@@ -107,10 +108,12 @@
                 return results;
               });
             }
-            if (dm.some(function(v) {
-              return v.test(mes);
-            })) {
-              flag = true;
+            if (!/<[^>]+>/.test(mes)) {
+              if (dm.some(function(v) {
+                return v.test(mes);
+              })) {
+                flag = true;
+              }
             }
             if (flag) {
               return _this.say(mes);
