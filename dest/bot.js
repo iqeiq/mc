@@ -76,7 +76,7 @@
               return;
             }
             t = sp[0].split(/\s+/)[0];
-            if (sp[1].length > 0) {
+            if (sp[1].length === 0) {
               return;
             }
             mes = t + " " + sp[1];
