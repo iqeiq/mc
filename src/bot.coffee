@@ -47,14 +47,8 @@ module.exports = class Bot extends EventEmitter
         t = sp[0].split(/\s+/)[0]
         return if sp[1].length is 0
         mes = "#{t} #{sp[1]}"
-        return if @db.mutedCache.some((u)-> ///#{u}///.test mes)
         
-        flag = false
-        if /the game/.test mes
-          flag = true
-        else if /earned the achievement/.test mes
-          flag = true
-        else if /<[^>]+>\s*#/.test mes
+        if /<[^>]+>\s*#/.test mes
           res = /<([^>]+)>\s*#\s*(.+)/.exec mes
           console.log "#{res[1]} #{res[2]}"
           @emit 'command', res[1], res[2], (res)=>
@@ -62,8 +56,17 @@ module.exports = class Bot extends EventEmitter
               @pexec "/etc/init.d/minecraft command tell #{res[1]} #{line}"
                 .catch (err)=>
                   logger.error err if err
+          return
+
+        return if @db.mutedCache.some((u)-> ///#{u}///.test mes)
+
+        flag = false
         unless /<[^>]+>/.test mes
-          if dm.some((v)-> v.test mes)
+          if /the game/.test mes
+            flag = true
+          else if /earned the achievement/.test mes
+            flag = true
+          else if dm.some((v)-> v.test mes)
             flag = true
         @say mes if flag
 

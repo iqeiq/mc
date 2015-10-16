@@ -80,17 +80,7 @@
               return;
             }
             mes = t + " " + sp[1];
-            if (_this.db.mutedCache.some(function(u) {
-              return RegExp("" + u).test(mes);
-            })) {
-              return;
-            }
-            flag = false;
-            if (/the game/.test(mes)) {
-              flag = true;
-            } else if (/earned the achievement/.test(mes)) {
-              flag = true;
-            } else if (/<[^>]+>\s*#/.test(mes)) {
+            if (/<[^>]+>\s*#/.test(mes)) {
               res = /<([^>]+)>\s*#\s*(.+)/.exec(mes);
               console.log(res[1] + " " + res[2]);
               _this.emit('command', res[1], res[2], function(res) {
@@ -107,9 +97,20 @@
                 }
                 return results;
               });
+              return;
             }
+            if (_this.db.mutedCache.some(function(u) {
+              return RegExp("" + u).test(mes);
+            })) {
+              return;
+            }
+            flag = false;
             if (!/<[^>]+>/.test(mes)) {
-              if (dm.some(function(v) {
+              if (/the game/.test(mes)) {
+                flag = true;
+              } else if (/earned the achievement/.test(mes)) {
+                flag = true;
+              } else if (dm.some(function(v) {
                 return v.test(mes);
               })) {
                 flag = true;
