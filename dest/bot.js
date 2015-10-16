@@ -22,9 +22,9 @@
   module.exports = Bot = (function(superClass) {
     extend(Bot, superClass);
 
-    function Bot(logger) {
+    function Bot(logger1) {
       var app, mclogfile, server, watcher;
-      this.logger = logger;
+      this.logger = logger1;
       app = express();
       app.get('/', function(req, res) {
         return res.send('matcha mura');
@@ -57,7 +57,7 @@
       watcher.on('change', (function(_this) {
         return function() {
           return exec("tail -n 1 " + mclogfile, function(err, stdout, stderr) {
-            var dmr, flag, i, len, line, mes, res, sp, t;
+            var flag, line, mes, res, sp, t;
             if (err) {
               _this.logger.error(err);
             }
@@ -92,14 +92,25 @@
               flag = true;
             } else if (/<[^>]+>\s*#/.test(mes)) {
               res = /<([^>]+)>\s*#\s*(.+)/.test(mes);
-              _this.emit('command', res[1], res[2], function(res) {});
+              _this.emit('command', res[1], res[2], function(res) {
+                var i, len, ref, results;
+                ref = res.split(/\r*\n/);
+                results = [];
+                for (i = 0, len = ref.length; i < len; i++) {
+                  line = ref[i];
+                  results.push(_this.pexec("/etc/init.d/minecraft command say " + line)["catch"](function(err) {
+                    if (err) {
+                      return logger.error(err);
+                    }
+                  }));
+                }
+                return results;
+              });
             }
-            for (i = 0, len = dm.length; i < len; i++) {
-              dmr = dm[i];
-              if (dmr.test(mes)) {
-                flag = true;
-                break;
-              }
+            if (dm.some(function(v) {
+              return v.test(mes);
+            })) {
+              flag = true;
             }
             if (flag) {
               return _this.say(mes);

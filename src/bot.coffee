@@ -56,11 +56,13 @@ module.exports = class Bot extends EventEmitter
           flag = true
         else if /<[^>]+>\s*#/.test mes
           res = /<([^>]+)>\s*#\s*(.+)/.test mes
-          @emit 'command', res[1], res[2], (res)->
-        for dmr in dm
-          if dmr.test mes
-            flag = true
-            break
+          @emit 'command', res[1], res[2], (res)=>
+            for line in res.split /\r*\n/
+              @pexec "/etc/init.d/minecraft command say #{line}"
+                .catch (err)=>
+                  logger.error err if err
+        if dm.some((v)-> v.test mes)
+          flag = true
         @say mes if flag
 
     @on 'command', (user, cmd, respond)=>
