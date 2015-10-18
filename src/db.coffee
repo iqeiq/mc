@@ -45,7 +45,7 @@ module.exports = class DB
         s = new @shareModel()
         s.user = user
         s.message = message
-        s.num = doc.num + 1
+        s.num = if doc? then doc.num + 1 else 0
         s.save (err)->
           if err then reject(err) else resolve()
 

@@ -86,7 +86,7 @@
             s = new _this.shareModel();
             s.user = user;
             s.message = message;
-            s.num = doc.num + 1;
+            s.num = doc != null ? doc.num + 1 : 0;
             return s.save(function(err) {
               if (err) {
                 return reject(err);
