@@ -40,12 +40,12 @@ module.exports = class DB
 
   register: (user, message)->
     new Promise (resolve, reject)=>
-      @shareModel.count (err, count)=>
+      @shareModel.findOne({}).sort('-num').exec (err, doc)=>
         return reject(err) if err
         s = new @shareModel()
         s.user = user
         s.message = message
-        s.num = count
+        s.num = doc.num + 1
         s.save (err)->
           if err then reject(err) else resolve()
 

@@ -78,7 +78,7 @@
     DB.prototype.register = function(user, message) {
       return new Promise((function(_this) {
         return function(resolve, reject) {
-          return _this.shareModel.count(function(err, count) {
+          return _this.shareModel.findOne({}).sort('-num').exec(function(err, doc) {
             var s;
             if (err) {
               return reject(err);
@@ -86,7 +86,7 @@
             s = new _this.shareModel();
             s.user = user;
             s.message = message;
-            s.num = count;
+            s.num = doc.num + 1;
             return s.save(function(err) {
               if (err) {
                 return reject(err);
