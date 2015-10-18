@@ -49,6 +49,11 @@
         }), 1000);
         return cb("終了します");
       });
+      this.addCommand(/^restart$/i, function(screen_name, text, cb) {
+        var command;
+        command = 'restart';
+        return this.emitter(screen_name, command).then(cb);
+      });
       this.addCommand(/lasterror/i, function(screen_name, text, cb) {
         return exec('cat log/sysyem.log.1 log/system.log | grep ERROR | tail -1', function(error, stdout, stderr) {
           return cb("\n" + stdout);
@@ -58,6 +63,7 @@
         return function(screen_name, text, cb) {
           var command;
           command = text.replace(/^cmd:[\s　]*/i, '');
+          command = command.replace(/^report/i, 'report_no');
           return _this.emitter(screen_name, command).then(cb);
         };
       })(this));

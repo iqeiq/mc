@@ -54,6 +54,11 @@ module.exports = class DB
       @shareModel.find {}, (err, docs)->
         if err then reject(err) else resolve(docs)
 
+  findOne: (opt)->
+    new Promise (resolve, reject)=>
+      @shareModel.findOne opt, (err, doc)->
+        if err then reject(err) else resolve(doc)
+
   remove: (num)->
     new Promise (resolve, reject)=>
       @shareModel.findOneAndRemove {num: num}, (err)->

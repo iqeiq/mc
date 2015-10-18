@@ -216,17 +216,36 @@
                   str = "";
                   for (i = 0, len = res.length; i < len; i++) {
                     doc = res[i];
-                    str += "[" + doc.num + "] " + doc.message + "\n";
+                    str += "\n[" + doc.num + "] " + doc.message;
                   }
                   return respond(str);
                 })["catch"](function(err) {
                   _this.logger.error(err.message);
-                  return respond("err");
+                  return respond("error.");
                 });
               } else {
                 report = args.join(' ');
                 return _this.db.register(user, report).then(function(res) {
                   return respond("ok.");
+                })["catch"](function(err) {
+                  _this.logger.error(err.message);
+                  return respond("error.");
+                });
+              }
+              break;
+            case 'report_no':
+              if (args.length !== 1) {
+                return respond("usage: report_no (number)  (( report => report_no in Twitter ))");
+              } else {
+                num = parseInt(args[0]);
+                return _this.db.findOne({
+                  num: num
+                }).then(function(doc) {
+                  if (doc != null) {
+                    return respond("\n[" + doc.num + "] " + doc.message);
+                  } else {
+                    return respond("Not Found.");
+                  }
                 })["catch"](function(err) {
                   _this.logger.error(err.message);
                   return respond("error.");

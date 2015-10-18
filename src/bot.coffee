@@ -140,15 +140,29 @@ module.exports = class Bot extends EventEmitter
               .then (res)->
                 str = ""
                 for doc in res
-                  str += "[#{doc.num}] #{doc.message}\n"
+                  str += "\n[#{doc.num}] #{doc.message}"
                 respond str
               .catch (err)=>
                 @logger.error err.message
-                respond "err"
+                respond "error."
           else
             report = args.join ' '
             @db.register user, report
               .then (res)-> respond "ok."
+              .catch (err)=>
+                @logger.error err.message
+                respond "error."
+        when 'report_no'
+          if args.length isnt 1
+            return respond "usage: report_no (number)  (( report => report_no in Twitter ))"
+          else
+            num = parseInt args[0]
+            @db.findOne {num: num}
+              .then (doc)->
+                if doc?
+                  respond "\n[#{doc.num}] #{doc.message}"
+                else
+                  respond "Not Found."
               .catch (err)=>
                 @logger.error err.message
                 respond "error."

@@ -113,6 +113,20 @@
       })(this));
     };
 
+    DB.prototype.findOne = function(opt) {
+      return new Promise((function(_this) {
+        return function(resolve, reject) {
+          return _this.shareModel.findOne(opt, function(err, doc) {
+            if (err) {
+              return reject(err);
+            } else {
+              return resolve(doc);
+            }
+          });
+        };
+      })(this));
+    };
+
     DB.prototype.remove = function(num) {
       return new Promise((function(_this) {
         return function(resolve, reject) {

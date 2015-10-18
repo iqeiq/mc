@@ -34,12 +34,18 @@ module.exports = class Twitter
       setTimeout (-> process.exit 1), 1000
       cb "終了します"
 
+    @addCommand /^restart$/i, (screen_name, text, cb)->
+      command = 'restart'
+      @emitter screen_name, command
+        .then cb
+
     @addCommand /lasterror/i, (screen_name, text, cb)->
       exec 'cat log/sysyem.log.1 log/system.log | grep ERROR | tail -1', (error, stdout, stderr)->
         cb "\n#{stdout}"
 
     @addCommand /^cmd:/i, (screen_name, text, cb)=>
       command = text.replace /^cmd:[\s　]*/i, ''
+      command = command.replace /^report/i, 'report_no'
       @emitter screen_name, command
         .then cb
 
