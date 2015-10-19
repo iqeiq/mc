@@ -72,7 +72,7 @@ module.exports = class Bot extends EventEmitter
           if /joined the game/.test mes
             flag = true
             res = /([^\s]+) joined the game/.exec mes
-            loginmes = setting.loginmes ? "po"
+            loginmes = setting.loginmes ? "{text: po}"
             @pexec "/etc/init.d/minecraft command 'tellraw #{res[1]} #{loginmes}'"
                 .catch (err)=>
                   logger.error err if err
