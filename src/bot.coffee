@@ -45,9 +45,9 @@ module.exports = class Bot extends EventEmitter
         @logger.trace stderr.toString() if stderr
         return if err or stderr
         line = stdout.toString().split /\r*\n/
-        return if line is prevlog
-        prevlog = line
         return if line.length is 0
+        return if line[0] is prevlog
+        prevlog = line[0]
         sp = line[0].split /]:\s*/
         return if sp.length < 2
         t = sp[0].split(/\s+/)[0]

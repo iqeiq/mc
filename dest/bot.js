@@ -75,13 +75,13 @@
               return;
             }
             line = stdout.toString().split(/\r*\n/);
-            if (line === prevlog) {
-              return;
-            }
-            prevlog = line;
             if (line.length === 0) {
               return;
             }
+            if (line[0] === prevlog) {
+              return;
+            }
+            prevlog = line[0];
             sp = line[0].split(/]:\s*/);
             if (sp.length < 2) {
               return;
