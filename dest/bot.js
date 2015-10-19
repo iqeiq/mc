@@ -65,7 +65,7 @@
           }
           prevlog = "";
           return exec("tail -n 1 " + mclogfile, function(err, stdout, stderr) {
-            var flag, line, loginmes, mes, ref, res, sp, t;
+            var flag, line, mes, res, sp, t;
             if (err) {
               _this.logger.error(err);
             }
@@ -117,20 +117,7 @@
             }
             flag = false;
             if (!/<[^>]+>/.test(mes)) {
-              if (/joined the game/.test(mes)) {
-                flag = true;
-                res = /([^\s]+) joined the game/.exec(mes);
-                loginmes = (ref = setting.loginmes) != null ? ref : 'po';
-                setTimeout(function() {
-                  return _this.pexec("/etc/init.d/minecraft command tellraw " + res[1] + " '" + loginmes + "'").then(function(res) {
-                    return console.log(res);
-                  })["catch"](function(err) {
-                    if (err) {
-                      return logger.error(err);
-                    }
-                  }, 3000);
-                });
-              } else if (/left the game/.test(mes)) {
+              if (/the game/.test(mes)) {
                 flag = true;
               } else if (/earned the achievement/.test(mes)) {
                 flag = true;
