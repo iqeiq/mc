@@ -32,7 +32,7 @@ module.exports = class Bot extends EventEmitter
           else
             reject err
 
-    mclogfile = '/home/matcha/minecraft4/logs/latest.log'
+    mclogfile = setting.MCLOG
 
     watcher = require('fs').watch mclogfile, (event)=>
       if event is 'rename'

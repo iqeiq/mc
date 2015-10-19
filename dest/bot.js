@@ -52,7 +52,7 @@
           });
         };
       })(this);
-      mclogfile = '/home/matcha/minecraft4/logs/latest.log';
+      mclogfile = setting.MCLOG;
       watcher = require('fs').watch(mclogfile, (function(_this) {
         return function(event) {
           var prevlog;
