@@ -23,7 +23,7 @@
     extend(Bot, superClass);
 
     function Bot(logger1) {
-      var app, mclogfile, server, watcher;
+      var app, mclogfile, prevlog, server, watcher;
       this.logger = logger1;
       app = express();
       app.get('/', function(req, res) {
@@ -53,6 +53,7 @@
         };
       })(this);
       mclogfile = '/home/matcha/minecraft4/logs/latest.log';
+      prevlog = "";
       watcher = require('fs').watch(mclogfile, (function(_this) {
         return function(event) {
           if (event === 'rename') {
@@ -74,6 +75,10 @@
               return;
             }
             line = stdout.toString().split(/\r*\n/);
+            if (line === prevlog) {
+              return;
+            }
+            prevlog = line;
             if (line.length === 0) {
               return;
             }
