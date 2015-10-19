@@ -59,8 +59,6 @@ module.exports = class Bot extends EventEmitter
           @emit 'command', res[1], res[2], (res)=>
             for line in res.split /\r*\n/
               @pexec "/etc/init.d/minecraft command say '#{line}'"
-                .then (res)=>
-                  console.log res
                 .catch (err)=>
                   logger.error err if err
           return
@@ -74,6 +72,8 @@ module.exports = class Bot extends EventEmitter
             res = /([^\s]+) joined the game/.exec mes
             loginmes = setting.loginmes ? "{text: po}"
             @pexec "/etc/init.d/minecraft command 'tellraw #{res[1]} #{loginmes}'"
+                .then (res)=>
+                  console.log res
                 .catch (err)=>
                   logger.error err if err
           else if /left the game/.test mes

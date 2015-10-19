@@ -100,9 +100,7 @@
                 results = [];
                 for (i = 0, len = ref.length; i < len; i++) {
                   line = ref[i];
-                  results.push(_this.pexec("/etc/init.d/minecraft command say '" + line + "'").then(function(res) {
-                    return console.log(res);
-                  })["catch"](function(err) {
+                  results.push(_this.pexec("/etc/init.d/minecraft command say '" + line + "'")["catch"](function(err) {
                     if (err) {
                       return logger.error(err);
                     }
@@ -123,7 +121,9 @@
                 flag = true;
                 res = /([^\s]+) joined the game/.exec(mes);
                 loginmes = (ref = setting.loginmes) != null ? ref : "{text: po}";
-                _this.pexec("/etc/init.d/minecraft command 'tellraw " + res[1] + " " + loginmes + "'")["catch"](function(err) {
+                _this.pexec("/etc/init.d/minecraft command 'tellraw " + res[1] + " " + loginmes + "'").then(function(res) {
+                  return console.log(res);
+                })["catch"](function(err) {
                   if (err) {
                     return logger.error(err);
                   }
