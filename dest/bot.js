@@ -121,7 +121,7 @@
                 flag = true;
                 res = /([^\s]+) joined the game/.exec(mes);
                 loginmes = (ref = setting.loginmes) != null ? ref : "po";
-                _this.pexec("/etc/init.d/minecraft command tell " + res[1] + " '" + loginmes + "'")["catch"](function(err) {
+                _this.pexec("/etc/init.d/minecraft command tellraw " + res[1] + " '" + loginmes + "'")["catch"](function(err) {
                   if (err) {
                     return logger.error(err);
                   }
