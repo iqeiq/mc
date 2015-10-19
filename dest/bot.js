@@ -93,14 +93,15 @@
             mes = t + " " + sp[1];
             if (/<[^>]+>\s*#/.test(mes)) {
               res = /<([^>]+)>\s*#\s*(.+)/.exec(mes);
-              console.log(res[1] + " " + res[2]);
               _this.emit('command', res[1], res[2], function(res) {
                 var i, len, ref, results;
                 ref = res.split(/\r*\n/);
                 results = [];
                 for (i = 0, len = ref.length; i < len; i++) {
                   line = ref[i];
-                  results.push(_this.pexec("/etc/init.d/minecraft command say '" + line + "'")["catch"](function(err) {
+                  results.push(_this.pexec("/etc/init.d/minecraft command say '" + line + "'").then(function(res) {
+                    return console.log(res);
+                  })["catch"](function(err) {
                     if (err) {
                       return logger.error(err);
                     }

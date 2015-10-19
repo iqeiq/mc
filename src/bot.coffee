@@ -56,10 +56,11 @@ module.exports = class Bot extends EventEmitter
         
         if /<[^>]+>\s*#/.test mes
           res = /<([^>]+)>\s*#\s*(.+)/.exec mes
-          console.log "#{res[1]} #{res[2]}"
           @emit 'command', res[1], res[2], (res)=>
             for line in res.split /\r*\n/
               @pexec "/etc/init.d/minecraft command say '#{line}'"
+                .then (res)=>
+                  console.log res
                 .catch (err)=>
                   logger.error err if err
           return
