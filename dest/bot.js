@@ -120,9 +120,9 @@
               if (/joined the game/.test(mes)) {
                 flag = true;
                 res = /([^\s]+) joined the game/.exec(mes);
-                loginmes = (ref = setting.loginmes) != null ? ref : '{text: "po"}';
+                loginmes = (ref = setting.loginmes) != null ? ref : 'po';
                 setTimeout(function() {
-                  return _this.pexec("/etc/init.d/minecraft command 'tellraw " + res[1] + " " + loginmes + "'").then(function(res) {
+                  return _this.pexec("/etc/init.d/minecraft command tellraw " + res[1] + " '" + loginmes + "'").then(function(res) {
                     return console.log(res);
                   })["catch"](function(err) {
                     if (err) {
