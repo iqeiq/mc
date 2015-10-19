@@ -70,13 +70,14 @@ module.exports = class Bot extends EventEmitter
           if /joined the game/.test mes
             flag = true
             res = /([^\s]+) joined the game/.exec mes
-            loginmes = setting.loginmes ? "{text: po}"
-            console.log "#{res[1]} #{loginmes}"
-            @pexec "/etc/init.d/minecraft command 'tellraw #{res[1]} #{loginmes}'"
+            loginmes = setting.loginmes ? '{text: "po"}'
+            setTimeout =>
+              @pexec "/etc/init.d/minecraft command 'tellraw #{res[1]} #{loginmes}'"
                 .then (res)=>
                   console.log res
                 .catch (err)=>
                   logger.error err if err
+              , 3000
           else if /left the game/.test mes
             flag = true
           else if /earned the achievement/.test mes
