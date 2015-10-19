@@ -63,7 +63,7 @@
             return;
           }
           return exec("tail -n 1 " + mclogfile, function(err, stdout, stderr) {
-            var flag, line, mes, res, sp, t;
+            var flag, line, loginmes, mes, ref, res, sp, t;
             if (err) {
               _this.logger.error(err);
             }
@@ -112,7 +112,16 @@
             }
             flag = false;
             if (!/<[^>]+>/.test(mes)) {
-              if (/the game/.test(mes)) {
+              if (/joined the game/.test(mes)) {
+                flag = true;
+                res = /([^\s]+) joined the game/.exec(mes);
+                loginmes = (ref = setting.loginmes) != null ? ref : "po";
+                _this.pexec("/etc/init.d/minecraft command tell " + res[1] + " '" + loginmes + "'")["catch"](function(err) {
+                  if (err) {
+                    return logger.error(err);
+                  }
+                });
+              } else if (/left the game/.test(mes)) {
                 flag = true;
               } else if (/earned the achievement/.test(mes)) {
                 flag = true;

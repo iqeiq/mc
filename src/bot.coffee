@@ -65,7 +65,14 @@ module.exports = class Bot extends EventEmitter
 
         flag = false
         unless /<[^>]+>/.test mes
-          if /the game/.test mes
+          if /joined the game/.test mes
+            flag = true
+            res = /([^\s]+) joined the game/.exec mes
+            loginmes = setting.loginmes ? "po"
+            @pexec "/etc/init.d/minecraft command tell #{res[1]} '#{loginmes}'"
+                .catch (err)=>
+                  logger.error err if err
+          else if /left the game/.test mes
             flag = true
           else if /earned the achievement/.test mes
             flag = true
