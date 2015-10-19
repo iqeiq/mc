@@ -23,7 +23,7 @@
     extend(Bot, superClass);
 
     function Bot(logger1) {
-      var app, mclogfile, prevlog, server, watcher;
+      var app, mclogfile, server, watcher;
       this.logger = logger1;
       app = express();
       app.get('/', function(req, res) {
@@ -53,9 +53,9 @@
         };
       })(this);
       mclogfile = '/home/matcha/minecraft4/logs/latest.log';
-      prevlog = "";
       watcher = require('fs').watch(mclogfile, (function(_this) {
         return function(event) {
+          var prevlog;
           if (event === 'rename') {
             _this.logger.info("logfile rotated. try restart.");
             return process.exit(1);
@@ -63,6 +63,7 @@
           if (event !== 'change') {
             return;
           }
+          prevlog = "";
           return exec("tail -n 1 " + mclogfile, function(err, stdout, stderr) {
             var flag, line, loginmes, mes, ref, res, sp, t;
             if (err) {
@@ -78,10 +79,6 @@
             if (line.length === 0) {
               return;
             }
-            if (line[0] === prevlog) {
-              return;
-            }
-            prevlog = line[0];
             sp = line[0].split(/]:\s*/);
             if (sp.length < 2) {
               return;
@@ -91,6 +88,10 @@
               return;
             }
             mes = t + " " + sp[1];
+            if (mes === prevlog) {
+              return;
+            }
+            prevlog = mes;
             if (/<[^>]+>\s*#/.test(mes)) {
               res = /<([^>]+)>\s*#\s*(.+)/.exec(mes);
               _this.emit('command', res[1], res[2], function(res) {
