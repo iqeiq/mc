@@ -167,7 +167,7 @@
         })(this));
         return;
       }
-      if (/抹茶/.test(text)) {
+      if (/^抹茶$/.test(text)) {
         data = {
           status: "抹茶 " + (new Date().getTime())
         };

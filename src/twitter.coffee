@@ -126,7 +126,7 @@ module.exports = class Twitter
 
       return
 
-    if /抹茶/.test text
+    if /^抹茶$/.test text
       data =
         status: "抹茶 #{new Date().getTime()}"
         #in_reply_to_status_id: reply_status_id
