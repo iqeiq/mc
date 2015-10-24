@@ -55,14 +55,14 @@
       })(this);
       morningTimer = (function(_this) {
         return function() {
+          var i, len, ref, user;
+          ref = _this.morningcall;
+          for (i = 0, len = ref.length; i < len; i++) {
+            user = ref[i];
+            _this.say("@" + user + " asadayo- " + (new Date().getTime()));
+          }
+          _this.morningcall = [];
           return setTimeout(function() {
-            var i, len, ref, user;
-            ref = _this.morningcall;
-            for (i = 0, len = ref.length; i < len; i++) {
-              user = ref[i];
-              _this.say("@" + user + " asadayo- " + (new Date().getTime()));
-            }
-            _this.morningcall = [];
             return morningTimer();
           }, 1200000);
         };
