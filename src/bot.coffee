@@ -39,7 +39,7 @@ module.exports = class Bot extends EventEmitter
         for user in @morningcall
           @say "@#{user} asadayo-"
         @morningcall = []
-        @morningTimer()
+        morningTimer()
       , 1200000
 
     @pexec "/etc/init.d/minecraft command time query daytime"

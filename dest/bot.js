@@ -63,7 +63,7 @@
               _this.say("@" + user + " asadayo-");
             }
             _this.morningcall = [];
-            return _this.morningTimer();
+            return morningTimer();
           }, 1200000);
         };
       })(this);
