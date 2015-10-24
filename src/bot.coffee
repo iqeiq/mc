@@ -37,7 +37,7 @@ module.exports = class Bot extends EventEmitter
     morningTimer = =>
       setTimeout =>
         for user in @morningcall
-          @say "@#{user} asadayo-"
+          @say "@#{user} asadayo- #{new Date().getTime()}"
         @morningcall = []
         morningTimer()
       , 1200000
