@@ -16,4 +16,8 @@
     return arr[rand(arr.length)];
   };
 
+  module.exports.zeroFill = function(num, n) {
+    return ("0" + num).slice(-n);
+  };
+
 }).call(this);

@@ -187,6 +187,32 @@
                 _this.logger.error(err.message);
                 return respond("error.");
               });
+            case 'time':
+              return _this.pexec("/etc/init.d/minecraft command time query daytime").then(function(out) {
+                var day, daytime, hour, line, message, minute, sp, time;
+                line = out.split(/\r*\n/);
+                line.splice(0, 1);
+                if (line.length === 0) {
+                  return;
+                }
+                sp = line[0].split(/Time\s*is\s*/);
+                if (sp.length !== 2) {
+                  return;
+                }
+                if (sp[1].length === 0) {
+                  return;
+                }
+                daytime = parseInt(sp[1]);
+                time = daytime % 24000;
+                day = Math.floor(daytime / 24000);
+                hour = (Math.floor(time / 1000) + 6) % 24;
+                minute = Math.floor((time % 1000) * 60 / 1000.0);
+                message = "Day " + day + "  " + hour + ":" + (util.zeroFill(minute, 2));
+                return respond(message);
+              })["catch"](function(err) {
+                _this.logger.error(err.message);
+                return respond("error.");
+              });
             case 'mute':
               list = _this.db.mutedCache.join(', ');
               return respond("muted: " + list);

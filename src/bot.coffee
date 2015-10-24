@@ -117,6 +117,25 @@ module.exports = class Bot extends EventEmitter
             .catch (err)=>
               @logger.error err.message
               respond "error."
+        when 'time'
+          @pexec "/etc/init.d/minecraft command time query daytime"
+            .then (out)=>
+              line = out.split /\r*\n/
+              line.splice 0, 1
+              return if line.length is 0
+              sp = line[0].split /Time\s*is\s*/
+              return unless sp.length is 2
+              return if sp[1].length is 0
+              daytime = parseInt sp[1]
+              time = daytime % 24000
+              day = Math.floor daytime / 24000
+              hour = (Math.floor(time / 1000) + 6) % 24
+              minute = Math.floor (time % 1000) * 60 / 1000.0
+              message = "Day #{day}  #{hour}:#{util.zeroFill(minute,2)}"
+              respond message 
+            .catch (err)=>
+              @logger.error err.message
+              respond "error."
         when 'mute'
           list = @db.mutedCache.join ', '
           respond "muted: #{list}"
