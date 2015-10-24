@@ -34,14 +34,6 @@ module.exports = class Bot extends EventEmitter
           else
             reject err
 
-    morningTimer = =>
-      for user in @morningcall
-        @say "@#{user} asadayo- #{new Date().getTime()}"
-      @morningcall = []
-      setTimeout =>
-        morningTimer()
-      , 1200000
-
     @pexec "/etc/init.d/minecraft command time query daytime"
     .then (out)=>
       line = out.split /\r*\n/
@@ -53,8 +45,8 @@ module.exports = class Bot extends EventEmitter
       daytime = parseInt sp[1]
       time = daytime % 24000
       ms = (24000 - time) * 50
-      setTimeout ->
-        morningTimer()
+      setTimeout =>
+        @morningTimer()
       , ms
     .catch (err)=>
       @logger.error err.message
@@ -239,3 +231,11 @@ module.exports = class Bot extends EventEmitter
 
   addEmitter: (cb)->
     @emitter.push cb
+
+  morningTimer: ->
+    for user in @morningcall
+      @say "@#{user} asadayo- #{new Date().getTime()}"
+    @morningcall = []
+    setTimeout =>
+      @morningTimer()
+    , 1200000

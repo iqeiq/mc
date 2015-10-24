@@ -23,7 +23,7 @@
     extend(Bot, superClass);
 
     function Bot(logger1) {
-      var app, mclogfile, morningTimer, server, watcher;
+      var app, mclogfile, server, watcher;
       this.logger = logger1;
       app = express();
       app.get('/', function(req, res) {
@@ -53,20 +53,6 @@
           });
         };
       })(this);
-      morningTimer = (function(_this) {
-        return function() {
-          var i, len, ref, user;
-          ref = _this.morningcall;
-          for (i = 0, len = ref.length; i < len; i++) {
-            user = ref[i];
-            _this.say("@" + user + " asadayo- " + (new Date().getTime()));
-          }
-          _this.morningcall = [];
-          return setTimeout(function() {
-            return morningTimer();
-          }, 1200000);
-        };
-      })(this);
       this.pexec("/etc/init.d/minecraft command time query daytime").then((function(_this) {
         return function(out) {
           var daytime, line, ms, sp, time;
@@ -86,7 +72,7 @@
           time = daytime % 24000;
           ms = (24000 - time) * 50;
           return setTimeout(function() {
-            return morningTimer();
+            return _this.morningTimer();
           }, ms);
         };
       })(this))["catch"]((function(_this) {
@@ -361,6 +347,21 @@
 
     Bot.prototype.addEmitter = function(cb) {
       return this.emitter.push(cb);
+    };
+
+    Bot.prototype.morningTimer = function() {
+      var i, len, ref, user;
+      ref = this.morningcall;
+      for (i = 0, len = ref.length; i < len; i++) {
+        user = ref[i];
+        this.say("@" + user + " asadayo- " + (new Date().getTime()));
+      }
+      this.morningcall = [];
+      return setTimeout((function(_this) {
+        return function() {
+          return _this.morningTimer();
+        };
+      })(this), 1200000);
     };
 
     return Bot;
