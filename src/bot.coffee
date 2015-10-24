@@ -23,6 +23,8 @@ module.exports = class Bot extends EventEmitter
 
     @emitter = []
 
+    @morningcall = []
+
     @pexec = (cmd)=>
       new Promise (resolve, reject)=>
         exec cmd, (err, stdout, stderr)=>
@@ -31,6 +33,31 @@ module.exports = class Bot extends EventEmitter
             resolve stdout.toString()
           else
             reject err
+
+    morningTimer = =>
+      setTimeout =>
+        for user in @morningcall
+          @say "@#{user} asadayo-"
+        @morningcall = []
+        @morningTimer()
+      , 1200000
+
+    @pexec "/etc/init.d/minecraft command time query daytime"
+    .then (out)=>
+      line = out.split /\r*\n/
+      line.splice 0, 1
+      return if line.length is 0
+      sp = line[0].split /Time\s*is\s*/
+      return unless sp.length is 2
+      return if sp[1].length is 0
+      daytime = parseInt sp[1]
+      time = daytime % 24000
+      ms = (24000 - time) * 50
+      setTimeout ->
+        morningTimer()
+      , ms
+    .catch (err)=>
+      @logger.error err.message
 
     mclogfile = setting.MCLOG
 
@@ -136,12 +163,16 @@ module.exports = class Bot extends EventEmitter
             .catch (err)=>
               @logger.error err.message
               respond "error."
+        when 'alarm'
+          @morningcall.push user
+          respond "ok."
         when 'mute'
           list = @db.mutedCache.join ', '
           respond "muted: #{list}"
         when 'addmute'
           if args.length is 0
-            return respond "usage: addmute (user1) [user2] ..."
+            #return respond "usage: addmute (user1) [user2] ..."
+            args.push user
           Promise.all args.map((user)=> @db.addMute user)
             .then (res)-> respond "ok."
             .catch (err)=>
@@ -149,7 +180,8 @@ module.exports = class Bot extends EventEmitter
               respond "error."
         when 'removemute'
           if args.length is 0
-            return respond "usage: removemute (user1) [user2] ..."
+            #return respond "usage: removemute (user1) [user2] ..."
+            args.push user
           Promise.all args.map((user)=> @db.removeMute user)
             .then (res)-> respond "ok."
             .catch (err)=>

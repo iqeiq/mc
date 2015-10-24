@@ -23,7 +23,7 @@
     extend(Bot, superClass);
 
     function Bot(logger1) {
-      var app, mclogfile, server, watcher;
+      var app, mclogfile, morningTimer, server, watcher;
       this.logger = logger1;
       app = express();
       app.get('/', function(req, res) {
@@ -36,6 +36,7 @@
       })(this));
       this.db = new DB;
       this.emitter = [];
+      this.morningcall = [];
       this.pexec = (function(_this) {
         return function(cmd) {
           return new Promise(function(resolve, reject) {
@@ -52,6 +53,47 @@
           });
         };
       })(this);
+      morningTimer = (function(_this) {
+        return function() {
+          return setTimeout(function() {
+            var i, len, ref, user;
+            ref = _this.morningcall;
+            for (i = 0, len = ref.length; i < len; i++) {
+              user = ref[i];
+              _this.say("@" + user + " asadayo-");
+            }
+            _this.morningcall = [];
+            return _this.morningTimer();
+          }, 1200000);
+        };
+      })(this);
+      this.pexec("/etc/init.d/minecraft command time query daytime").then((function(_this) {
+        return function(out) {
+          var daytime, line, ms, sp, time;
+          line = out.split(/\r*\n/);
+          line.splice(0, 1);
+          if (line.length === 0) {
+            return;
+          }
+          sp = line[0].split(/Time\s*is\s*/);
+          if (sp.length !== 2) {
+            return;
+          }
+          if (sp[1].length === 0) {
+            return;
+          }
+          daytime = parseInt(sp[1]);
+          time = daytime % 24000;
+          ms = (24000 - time) * 50;
+          return setTimeout(function() {
+            return morningTimer();
+          }, ms);
+        };
+      })(this))["catch"]((function(_this) {
+        return function(err) {
+          return _this.logger.error(err.message);
+        };
+      })(this));
       mclogfile = setting.MCLOG;
       watcher = require('fs').watch(mclogfile, (function(_this) {
         return function(event) {
@@ -213,12 +255,15 @@
                 _this.logger.error(err.message);
                 return respond("error.");
               });
+            case 'alarm':
+              _this.morningcall.push(user);
+              return respond("ok.");
             case 'mute':
               list = _this.db.mutedCache.join(', ');
               return respond("muted: " + list);
             case 'addmute':
               if (args.length === 0) {
-                return respond("usage: addmute (user1) [user2] ...");
+                args.push(user);
               }
               return Promise.all(args.map(function(user) {
                 return _this.db.addMute(user);
@@ -230,7 +275,7 @@
               });
             case 'removemute':
               if (args.length === 0) {
-                return respond("usage: removemute (user1) [user2] ...");
+                args.push(user);
               }
               return Promise.all(args.map(function(user) {
                 return _this.db.removeMute(user);
