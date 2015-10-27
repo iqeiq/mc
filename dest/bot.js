@@ -37,49 +37,7 @@
       this.db = new DB;
       this.emitter = [];
       this.morningcall = [];
-      this.pexec = (function(_this) {
-        return function(cmd) {
-          return new Promise(function(resolve, reject) {
-            return exec(cmd, function(err, stdout, stderr) {
-              if (stderr) {
-                _this.logger.trace(stderr.toString());
-              }
-              if (!err) {
-                return resolve(stdout.toString());
-              } else {
-                return reject(err);
-              }
-            });
-          });
-        };
-      })(this);
-      this.pexec("/etc/init.d/minecraft command time query daytime").then((function(_this) {
-        return function(out) {
-          var daytime, line, ms, sp, time;
-          line = out.split(/\r*\n/);
-          line.splice(0, 1);
-          if (line.length === 0) {
-            return;
-          }
-          sp = line[0].split(/Time\s*is\s*/);
-          if (sp.length !== 2) {
-            return;
-          }
-          if (sp[1].length === 0) {
-            return;
-          }
-          daytime = parseInt(sp[1]);
-          time = daytime % 24000;
-          ms = (24000 - time) * 50;
-          return setTimeout(function() {
-            return _this.morningTimer();
-          }, ms);
-        };
-      })(this))["catch"]((function(_this) {
-        return function(err) {
-          return _this.logger.error(err.message);
-        };
-      })(this));
+      this.alarmstart();
       mclogfile = setting.MCLOG;
       watcher = require('fs').watch(mclogfile, (function(_this) {
         return function(event) {
@@ -205,6 +163,10 @@
                       num = players.length;
                     }
                   }
+                } else {
+                  _this.logger.debug("failed to getting player list.");
+                  _this.emit('command', user, cmd, respond);
+                  return;
                 }
                 message = "There are " + num + " players!";
                 if (num !== 0) {
@@ -347,6 +309,63 @@
 
     Bot.prototype.addEmitter = function(cb) {
       return this.emitter.push(cb);
+    };
+
+    Bot.prototype.pexec = function(cmd) {
+      return new Promise((function(_this) {
+        return function(resolve, reject) {
+          return exec(cmd, function(err, stdout, stderr) {
+            if (stderr) {
+              _this.logger.trace(stderr.toString());
+            }
+            if (!err) {
+              return resolve(stdout.toString());
+            } else {
+              return reject(err);
+            }
+          });
+        };
+      })(this));
+    };
+
+    Bot.prototype.alarmstart = function(cnt) {
+      if (cnt == null) {
+        cnt = 0;
+      }
+      if (cnt > 3) {
+        this.logger.error("failed to starting alarm cycle.");
+        return;
+      }
+      return this.pexec("/etc/init.d/minecraft command time query daytime").then((function(_this) {
+        return function(out) {
+          var daytime, line, ms, sp, time;
+          line = out.split(/\r*\n/);
+          line.splice(0, 1);
+          if (line.length === 0) {
+            _this.alarmstart(cnt + 1);
+            return;
+          }
+          sp = line[0].split(/Time\s*is\s*/);
+          if (sp.length !== 2) {
+            _this.alarmstart(cnt + 1);
+            return;
+          }
+          if (sp[1].length === 0) {
+            _this.alarmstart(cnt + 1);
+            return;
+          }
+          daytime = parseInt(sp[1]);
+          time = daytime % 24000;
+          ms = (24000 - time) * 50;
+          return setTimeout(function() {
+            return _this.morningTimer();
+          }, ms);
+        };
+      })(this))["catch"]((function(_this) {
+        return function(err) {
+          return _this.logger.error(err.message);
+        };
+      })(this));
     };
 
     Bot.prototype.morningTimer = function() {

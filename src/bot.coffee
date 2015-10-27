@@ -25,31 +25,7 @@ module.exports = class Bot extends EventEmitter
 
     @morningcall = []
 
-    @pexec = (cmd)=>
-      new Promise (resolve, reject)=>
-        exec cmd, (err, stdout, stderr)=>
-          @logger.trace stderr.toString() if stderr
-          unless err
-            resolve stdout.toString()
-          else
-            reject err
-
-    @pexec "/etc/init.d/minecraft command time query daytime"
-    .then (out)=>
-      line = out.split /\r*\n/
-      line.splice 0, 1
-      return if line.length is 0
-      sp = line[0].split /Time\s*is\s*/
-      return unless sp.length is 2
-      return if sp[1].length is 0
-      daytime = parseInt sp[1]
-      time = daytime % 24000
-      ms = (24000 - time) * 50
-      setTimeout =>
-        @morningTimer()
-      , ms
-    .catch (err)=>
-      @logger.error err.message
+    @alarmstart()
 
     mclogfile = setting.MCLOG
 
@@ -130,6 +106,10 @@ module.exports = class Bot extends EventEmitter
                     players = players.filter (p)=> 
                       @db.mutedCache.every (u)-> u isnt p
                     num = players.length
+              else
+                @logger.debug "failed to getting player list."
+                @emit 'command', user, cmd, respond
+                return
               message = "There are #{num} players!"
               message += " (#{players.join ', '})" if num isnt 0
               respond message 
@@ -231,6 +211,43 @@ module.exports = class Bot extends EventEmitter
 
   addEmitter: (cb)->
     @emitter.push cb
+
+  pexec: (cmd)->
+    new Promise (resolve, reject)=>
+      exec cmd, (err, stdout, stderr)=>
+        @logger.trace stderr.toString() if stderr
+        unless err
+          resolve stdout.toString()
+        else
+          reject err
+
+  alarmstart: (cnt = 0)->
+    if cnt > 3
+      @logger.error "failed to starting alarm cycle."
+      return
+    @pexec "/etc/init.d/minecraft command time query daytime"
+    .then (out)=>
+      line = out.split /\r*\n/
+      line.splice 0, 1
+      if line.length is 0
+        @alarmstart cnt + 1 
+        return
+      sp = line[0].split /Time\s*is\s*/
+      unless sp.length is 2
+        @alarmstart cnt + 1 
+        return 
+      if sp[1].length is 0
+        @alarmstart cnt + 1 
+        return
+      daytime = parseInt sp[1]
+      time = daytime % 24000
+      ms = (24000 - time) * 50
+      setTimeout =>
+        @morningTimer()
+      , ms
+    .catch (err)=>
+      @logger.error err.message
+
 
   morningTimer: ->
     for user in @morningcall
