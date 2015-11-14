@@ -80,7 +80,10 @@ module.exports = class Bot extends EventEmitter
           @pexec "ps -ef | egrep '[S]CREEN.+minecraft' | awk '{print $2};'"
             .then (out)=>
               if out.length > 0
-                pid = parseInt out
+                if user isnt 'mokha_trogy'
+                  respond "server was alive... Permission denied."
+                  return
+                pid = parseInt out[0]
                 console.log pid
                 @pexec "kill -9 #{pid}"
                   .then ->

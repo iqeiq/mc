@@ -130,7 +130,11 @@
               return _this.pexec("ps -ef | egrep '[S]CREEN.+minecraft' | awk '{print $2};'").then(function(out) {
                 var pid;
                 if (out.length > 0) {
-                  pid = parseInt(out);
+                  if (user !== 'mokha_trogy') {
+                    respond("server was alive... Permission denied.");
+                    return;
+                  }
+                  pid = parseInt(out[0]);
                   console.log(pid);
                   return _this.pexec("kill -9 " + pid).then(function() {
                     return respond("server was alive... kill process. please try again.");
