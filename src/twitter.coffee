@@ -77,7 +77,7 @@ module.exports = class Twitter
     mentions = data.entities.user_mentions
     name = data.user.name
     screen_name = data.user.screen_name
-    reply_status_id = data.in_reply_to_status_id_str
+    reply_status_id = data.id_str
     via = data.source.replace new RegExp(/<[^>]+>/g),''
 
     isMention = if mentions.length is 0 then false else mentions[0].id_str is setting.TWITTER.OWNER_ID
@@ -113,7 +113,7 @@ module.exports = class Twitter
               status: "@#{screen_name} #{res}"
               in_reply_to_status_id: reply_status_id
             @client.post 'statuses/update', data, (err)->
-              throw error if err
+              throw err if err
           return
 
       @emitter screen_name, "list"
